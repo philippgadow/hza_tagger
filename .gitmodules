@@ -1,0 +1,3 @@
+[submodule "tagger/salt"]
+	path = tagger/salt
+	url = https://github.com/umami-hep/salt.git
