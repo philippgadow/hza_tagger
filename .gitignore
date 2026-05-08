@@ -17,8 +17,15 @@ data/
 logs/
 lightning_logs/
 
+# Generated analysis artefacts
+analysis/plots/
+tagger/configs/norm_dict.yaml
+
 # Notebooks checkpoints
 .ipynb_checkpoints/
+
+# Secrets
+.env
 
 # Editor / OS
 .DS_Store

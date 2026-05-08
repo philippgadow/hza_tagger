@@ -65,11 +65,12 @@ def process_events(events) -> dict[str, np.ndarray]:
     """
     # ── 1. Jet selection ─────────────────────────────────────────────────────
     jets = events.Jet
-    sel = (
-        (jets.pt > JET_PT_MIN)
-        & (abs(jets.eta) < JET_ETA_MAX)
-        & (jets.jetId >= JET_ID_MIN)
-    )
+    sel = (jets.pt > JET_PT_MIN) & (abs(jets.eta) < JET_ETA_MAX)
+    # jetId may be absent in pheno-level NanoAOD
+    try:
+        sel = sel & (jets.jetId >= JET_ID_MIN)
+    except (AttributeError, ak.errors.FieldNotFoundError):
+        pass
     jets = jets[sel]
 
     n_jets_total = ak.sum(ak.num(jets))
@@ -198,10 +199,11 @@ def process_events(events) -> dict[str, np.ndarray]:
     n_jets = len(jet_pt_flat)
 
     jets_arr = np.zeros(n_jets, dtype=JET_DTYPE)
-    jets_arr["pt"]   = jet_pt_flat
-    jets_arr["eta"]  = jet_eta_flat
-    jets_arr["phi"]  = jet_phi_flat
-    jets_arr["mass"] = jet_mass_flat
+    jets_arr["pt"]    = jet_pt_flat
+    jets_arr["eta"]   = jet_eta_flat
+    jets_arr["phi"]   = jet_phi_flat
+    jets_arr["mass"]  = jet_mass_flat
+    jets_arr["a_jet"] = labels_flat
 
     labels_arr = np.zeros(n_jets, dtype=LABEL_DTYPE)
     labels_arr["a_jet"] = labels_flat

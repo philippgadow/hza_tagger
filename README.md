@@ -37,17 +37,20 @@ Compare with `common/variables.py` and adjust branch names there if needed.
 ### 4. Edit the converter config
 
 ```bash
-vim converter/configs/hza_signal.yaml   # set file paths, cuts, chunk size
+nano converter/configs/hza_signal.yaml   # set file paths, cuts, chunk size
 ```
 
 ### 5. Run converter (local, quick test)
 
 ```bash
-python converter/run_local.py \
-    --config converter/configs/hza_signal.yaml \
-    --out data/test_out.h5 \
-    --max-events 5000
+python converter/run_local.py --config converter/configs/hza_signal.yaml
 ```
+
+This reads `split_fractions` from the config (default 70 / 15 / 15 %) and writes
+three files: `data/train.h5`, `data/val.h5`, `data/test.h5`.
+
+Pass `--out data/all.h5` to skip the split and write a single file (useful for quick tests).
+Pass `--max-events N` to cap the number of events read.
 
 ### 6. Scale out on DESY NAF / HTCondor
 
@@ -67,21 +70,62 @@ bash tagger/scripts/train.sh        # launches SALT training
 
 On DESY NAF GPU nodes, add `--trainer.accelerator gpu --trainer.devices 1` to `train.sh`.
 
+**Comet.ml logging** is enabled automatically when a `COMET_API_KEY` is present.
+
+<details>
+<summary>Setting up a Comet account (first time)</summary>
+
+1. Go to **[comet.com](https://www.comet.com)** and sign up for a free account.
+2. After logging in, open **[comet.com/api/my/settings](https://www.comet.com/api/my/settings)** and copy your **API key**.
+3. Create `.env` in the project root (it is git-ignored):
+   ```bash
+   cp .env.example .env
+   # then open .env and paste your key:
+   #   COMET_API_KEY=<your_key>
+   ```
+
+</details>
+
+`train.sh` sources `.env` on every run and passes the key to `CometLogger`. Without a key it falls back to offline mode (logs saved under `logs/`).
+
 ### 8. Evaluate
 
-```bash
-# Score the test H5 with the best checkpoint
-python analysis/scripts/eval_to_h5.py \
-    --input  data/test.h5 \
-    --ckpt   logs/hza_tagger*/checkpoints/best.ckpt \
-    --config tagger/configs/hza_train.yaml \
-    --output data/test_scores.h5
+The evaluation script auto-discovers the test H5 file, the most recent checkpoint, and the training config from the standard project layout:
 
-# Produce plots
-python analysis/scripts/plots.py \
-    --scores data/test_scores.h5 \
-    --outdir analysis/plots/
+```bash
+bash analysis/scripts/evaluate.sh
 ```
+
+It runs two steps in sequence and writes plots to `analysis/plots/`:
+
+1. **Score** — `eval_to_h5.py` loads the best checkpoint and appends a `scores` dataset (shape `(N, 2)`) to a copy of the test H5.
+2. **Plot** — `plots.py` produces ROC curves, score distributions, and efficiency vs pT/η.
+
+**Override any path** via argument or environment variable:
+
+```bash
+# Explicit test file
+bash analysis/scripts/evaluate.sh data/my_test.h5
+
+# Explicit test file + checkpoint
+bash analysis/scripts/evaluate.sh data/my_test.h5 logs/my_run/checkpoints/best.ckpt
+
+# Environment variable overrides
+TEST_FILE=data/my_test.h5 \
+CKPT=logs/my_run/checkpoints/best.ckpt \
+PLOT_DIR=analysis/plots/my_run \
+bash analysis/scripts/evaluate.sh
+```
+
+The auto-discovery priority is:
+
+| Variable | Search order |
+|----------|-------------|
+| `TEST_FILE` | `data/test.h5` → `data/test_out.h5` → first `data/*.h5` |
+| `CKPT` | lowest `val_loss` across all `logs/*/ckpts/epoch=*-val_loss=*.ckpt`; falls back to `best.ckpt` |
+| `TRAIN_CFG` | `tagger/configs/hza_train.yaml` |
+| `SCORES_FILE` | same dir as test file, `<name>_scores.h5` |
+| `PLOT_DIR` | `analysis/plots/` |
 
 ## Tests
 

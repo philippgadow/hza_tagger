@@ -1,7 +1,7 @@
 name: hza_tagger
 channels:
   - conda-forge
-  - defaults
+  - nodefaults
 
 dependencies:
   - python=3.11
@@ -34,6 +34,8 @@ dependencies:
   - ipykernel
 
   - pip:
+    # setuptools<81 required: pkg_resources was removed in 81, needed by lightning 2.2
+    - setuptools<81
     # HTCondor job submission
     - dask-jobqueue>=0.8
     # SALT (installed as submodule, see tagger/scripts/setup_salt.sh)

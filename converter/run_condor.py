@@ -42,19 +42,28 @@ def parse_args():
 
 def convert_one_file(file_path: str, out_path: str, cfg: dict):
     """Worker function executed on the condor node."""
-    import uproot
+    import awkward as ak
+    from coffea.nanoevents import NanoEventsFactory, NanoAODSchema
     from converter.processors.jet_dumper import process_events
     from converter.processors.writer import H5Writer
 
     tree_name  = cfg.get("tree", "Events")
     chunk_size = cfg.get("chunk_size", 10_000)
 
+    import uproot
+    tree = uproot.open(f"{file_path}:{tree_name}")
+    n_entries = tree.num_entries
+
     with H5Writer(out_path) as writer:
-        f    = uproot.open(file_path)
-        tree = f[tree_name]
-        for start in range(0, tree.num_entries, chunk_size):
-            stop   = min(start + chunk_size, tree.num_entries)
-            chunk  = tree.arrays(entry_start=start, entry_stop=stop, library="ak")
+        for start in range(0, n_entries, chunk_size):
+            stop  = min(start + chunk_size, n_entries)
+            chunk = NanoEventsFactory.from_root(
+                {file_path: tree_name},
+                entry_start=start,
+                entry_stop=stop,
+                schemaclass=NanoAODSchema,
+            ).events()
+            chunk  = ak.Array(chunk.compute())
             arrays = process_events(chunk)
             if len(arrays["jets"]) > 0:
                 writer.write_chunk(arrays["jets"], arrays["tracks"], arrays["labels"])

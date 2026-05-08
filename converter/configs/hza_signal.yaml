@@ -6,7 +6,8 @@ name: hza_signal
 # Input files — local paths or xrootd URIs
 # One file per line; use {XROOTD_SERVER} env var for site-specific prefix
 files:
-  - /path/to/hzanano_output_1.root
+  - /Users/pgadow/Coding/uhh/pheno/hza_ml/data/hzanano_output_1.root
+  - /Users/pgadow/Coding/uhh/pheno/hza_ml/data/hzanano_output_2.root
   # - root://cms-xrd-global.cern.ch//store/...
 
 # TTree name inside the ROOT file
