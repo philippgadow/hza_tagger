@@ -6,37 +6,19 @@ name: hza_signal
 # Input files — local paths or xrootd URIs
 # One file per line; use {XROOTD_SERVER} env var for site-specific prefix
 files:
-  - /Users/pgadow/Coding/uhh/pheno/hza_ml/data/hzanano_output_1.root
-  - /Users/pgadow/Coding/uhh/pheno/hza_ml/data/hzanano_output_2.root
-  - /Users/pgadow/Coding/uhh/pheno/hza_ml/data/hzanano_output_3.root
-  - /Users/pgadow/Coding/uhh/pheno/hza_ml/data/hzanano_output_4.root
-  - /Users/pgadow/Coding/uhh/pheno/hza_ml/data/hzanano_output_5.root
-  - /Users/pgadow/Coding/uhh/pheno/hza_ml/data/hzanano_output_6.root
-  - /Users/pgadow/Coding/uhh/pheno/hza_ml/data/hzanano_output_7.root
-  - /Users/pgadow/Coding/uhh/pheno/hza_ml/data/hzanano_output_8.root
-  - /Users/pgadow/Coding/uhh/pheno/hza_ml/data/hzanano_output_9.root
-  - /Users/pgadow/Coding/uhh/pheno/hza_ml/data/hzanano_output_10.root
-  - /Users/pgadow/Coding/uhh/pheno/hza_ml/data/hzanano_output_11.root
-  - /Users/pgadow/Coding/uhh/pheno/hza_ml/data/hzanano_output_12.root
-  - /Users/pgadow/Coding/uhh/pheno/hza_ml/data/hzanano_output_13.root
-  - /Users/pgadow/Coding/uhh/pheno/hza_ml/data/hzanano_output_14.root
-  - /Users/pgadow/Coding/uhh/pheno/hza_ml/data/hzanano_output_15.root
-  - /Users/pgadow/Coding/uhh/pheno/hza_ml/data/hzanano_output_16.root
-  - /Users/pgadow/Coding/uhh/pheno/hza_ml/data/hzanano_output_17.root
-  - /Users/pgadow/Coding/uhh/pheno/hza_ml/data/hzanano_output_18.root
-  - /Users/pgadow/Coding/uhh/pheno/hza_ml/data/hzanano_output_19.root
-  - /Users/pgadow/Coding/uhh/pheno/hza_ml/data/hzanano_output_20.root
-  - /Users/pgadow/Coding/uhh/pheno/hza_ml/data/hzanano_output_21.root
-  - /Users/pgadow/Coding/uhh/pheno/hza_ml/data/hzanano_output_22.root
-  - /Users/pgadow/Coding/uhh/pheno/hza_ml/data/hzanano_output_23.root
-  - /Users/pgadow/Coding/uhh/pheno/hza_ml/data/hzanano_output_24.root
-  - /Users/pgadow/Coding/uhh/pheno/hza_ml/data/hzanano_output_25.root
-  - /Users/pgadow/Coding/uhh/pheno/hza_ml/data/hzanano_output_26.root
-  - /Users/pgadow/Coding/uhh/pheno/hza_ml/data/hzanano_output_27.root
-  - /Users/pgadow/Coding/uhh/pheno/hza_ml/data/hzanano_output_28.root
-  - /Users/pgadow/Coding/uhh/pheno/hza_ml/data/hzanano_output_29.root
-  - /Users/pgadow/Coding/uhh/pheno/hza_ml/data/hzanano_output_30.root
-  - /Users/pgadow/Coding/uhh/pheno/hza_ml/data/btvnano_output_1.root
+    # background files (~300k event per file)
+  - /pnfs/desy.de/cms/tier2/store/user/pgadow/HZa_backgrounds/RunIII2024Summer24BTVNanoAllPF/DYto2Mu_Bin-MLL-50to120_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24BTVNanoAllPF/260225_105208/0000/*.root 
+    # signal sample files (~1k events per file)
+    #- /pnfs/desy.de/cms/tier2/store/user/mjalalva/ggH_HZa_signals/RunIII2024Summer24/ggH_HZa_mA0_5GeV/RunIII2024Summer24HZANanoAllPF/260504_110127/0000/*.root
+    #- /pnfs/desy.de/cms/tier2/store/user/mjalalva/ggH_HZa_signals/RunIII2024Summer24/ggH_HZa_mA0_75GeV/RunIII2024Summer24HZANanoAllPF/260504_110137/0000/*.root
+    #- /pnfs/desy.de/cms/tier2/store/user/mjalalva/ggH_HZa_signals/RunIII2024Summer24/ggH_HZa_mA1_0GeV/RunIII2024Summer24HZANanoAllPF/260504_110146/0000/*.root
+    #- /pnfs/desy.de/cms/tier2/store/user/mjalalva/ggH_HZa_signals/RunIII2024Summer24/ggH_HZa_mA1_5GeV/RunIII2024Summer24HZANanoAllPF/260504_110155/0000/*.root
+    #- /pnfs/desy.de/cms/tier2/store/user/mjalalva/ggH_HZa_signals/RunIII2024Summer24/ggH_HZa_mA2_0GeV/RunIII2024Summer24HZANanoAllPF/260504_110204/0000/*.root
+    #- /pnfs/desy.de/cms/tier2/store/user/mjalalva/ggH_HZa_signals/RunIII2024Summer24/ggH_HZa_mA2_5GeV/RunIII2024Summer24HZANanoAllPF/260504_110213/0000/*.root
+    #- /pnfs/desy.de/cms/tier2/store/user/mjalalva/ggH_HZa_signals/RunIII2024Summer24/ggH_HZa_mA3_0GeV/RunIII2024Summer24HZANanoAllPF/260504_110222/0000/*.root  
+    #- /pnfs/desy.de/cms/tier2/store/user/mjalalva/ggH_HZa_signals/RunIII2024Summer24/ggH_HZa_mA3_5GeV/RunIII2024Summer24HZANanoAllPF/260504_110231/0000/*.root 
+    #- /pnfs/desy.de/cms/tier2/store/user/mjalalva/ggH_HZa_signals/RunIII2024Summer24/ggH_HZa_mA4_0GeV/RunIII2024Summer24HZANanoAllPF/260504_110240/0000/*.root 
+    #- /pnfs/desy.de/cms/tier2/store/user/mjalalva/ggH_HZa_signals/RunIII2024Summer24/ggH_HZa_mA8_0GeV/RunIII2024Summer24HZANanoAllPF/260504_110249/0000/*.root 
   # - root://cms-xrd-global.cern.ch//store/...
 
 # TTree name inside the ROOT file
@@ -65,7 +47,8 @@ n_tracks: 40
 
 # Maximum number of events to read per file (null = all events).
 # Useful to cap large background files, e.g. set 200000 for btvNano.
-max_events_per_file: 5000
+max_events_per_file: 200000 # background 
+#max_events_per_file: 5000 # signal
 
 # Coffea chunk size (events per chunk).
 # Larger = fewer NanoEventsFactory calls = faster; keep below ~1 GB RAM per chunk.
