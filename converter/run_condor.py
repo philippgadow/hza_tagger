@@ -91,7 +91,7 @@ def merge_files(outdir: Path, merged_path: Path):
     import h5py
     import numpy as np
     from common.io import JETS_DATASET, TRACKS_DATASET, LABELS_DATASET
-
+	import time
 
     chunks = sorted(outdir.glob("chunk_*.h5"))
     print(f"Merging {len(chunks)} chunk files → {merged_path}")
@@ -99,10 +99,29 @@ def merge_files(outdir: Path, merged_path: Path):
     with h5py.File(merged_path, "w") as fout:
         first = True
         for chunk_path in chunks:
-            with h5py.File(chunk_path, "r") as fin:
+            # VIBECODED BLOCK START
+			# ─── ADD RETRY LOGIC FOR NETWORK FILE LOCKS ──────────────────────
+            fin = None
+            retries = 5
+            while retries > 0:
+                try:
+                    fin = h5py.File(chunk_path, "r")
+                    break # Success! Break the retry loop
+                except (BlockingIOError, OSError):
+                    retries -= 1
+                    print(f"File {chunk_path.name} is locked by network filesystem. Retrying in 2s... ({retries} left)")
+                    time.sleep(5)
+            if fin is None:
+                raise RuntimeError(f"Could not open {chunk_path} after multiple retries due to network filesystem locks.")
+            # ─────────────────────────────────────────────────────────────────
+
+            try:
                 jets   = fin[JETS_DATASET][:]
                 tracks = fin[TRACKS_DATASET][:]
                 labels = fin[LABELS_DATASET][:]
+            finally:
+                fin.close() # Always ensure it gets closed explicitly
+			# VIBECODED BLOCK END 
             if first:
                 fout.create_dataset(JETS_DATASET,   data=jets,   maxshape=(None,),          compression="gzip")
                 fout.create_dataset(TRACKS_DATASET, data=tracks, maxshape=(None, tracks.shape[1]), compression="gzip")

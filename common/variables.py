@@ -41,8 +41,8 @@ PFCAND_KIN_BRANCHES = [
     "PFCands_genCandIdx",   # index into GenCands (−1 = unmatched); absent in data → handled gracefully
 ]
 # for sig
-PFCAND_KIN_BRANCHES = PFCands
 PFCands = PFCAND_KIN_BRANCHES
+PFCAND_KIN_BRANCHES = PFCands
 
 # not found in either signal or bkg files I was given
 # PFCand track / IP branches (may be absent in pheno nanos — handled gracefully)
@@ -64,8 +64,8 @@ GENJET_BRANCHES = [
     "GenJet_mass",
 ]
 # for sig
-GENJET_BRANCHES = GenJet
 GenJet = GENJET_BRANCHES
+GENJET_BRANCHES = GenJet
 
 # GenCands branches (truth particles matched 1-to-1 to PFCands; pheno nanos only)
 GENCANDS_BRANCHES = [
@@ -74,8 +74,8 @@ GENCANDS_BRANCHES = [
     "GenCands_isFromC",
 ]
 # for sig
-GENCANDS_BRANCHES = GenCands
 GenCands = GENCANDS_BRANCHES
+GENCANDS_BRANCHES = GenCands
 
 # GenPart branches
 GENPART_BRANCHES = [
@@ -88,8 +88,8 @@ GENPART_BRANCHES = [
     "GenPart_statusFlags",
 ]
 # for sig
-GENPART_BRANCHES = GenPart
 GenPart = GENPART_BRANCHES
+GENPART_BRANCHES = GenPart
 
 # ── Feature variable lists (used in SALT configs) ────────────────────────────
 
