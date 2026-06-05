@@ -1,3 +1,7 @@
+# Warmup directory
+1. The "original" notebook provides the starter code for loading data and making plots
+2. The "my version" notebook provides a (roughly) completed notebook for guidance
+
 # Jet tagging of low mass resonances
 
 This project provides tools to train and evaluate a jet tagger for a H→Z(ll)+a(had) search at the CMS experiment.
