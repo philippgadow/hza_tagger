@@ -117,7 +117,7 @@ def merge_files(outdir: Path, merged_path: Path):
     import time
     from common.io import JETS_DATASET, TRACKS_DATASET, LABELS_DATASET
 	
-    chunks = sorted(outdir.glob("chunk_*.h5"))
+    chunks = sorted(outdir.glob("chunk*.h5"))
     print(f"Merging {len(chunks)} chunk files → {merged_path}")
 
     with h5py.File(merged_path, "w") as fout:
@@ -221,7 +221,7 @@ def main():
     n = args.name
     futures = []
     for i, file_path in enumerate(cfg["files"]):
-        out_path = str(outdir / f"chunk_{n}_{i:04d}.h5")
+        out_path = str(outdir / f"chunk{n}_{i:04d}.h5")
         fut = client.submit(convert_one_file, file_path, out_path, cfg)
         futures.append(fut)
 
@@ -242,7 +242,7 @@ def main():
     # ─────────────────────────────────────────────────────────────────────────
 
     if args.merge:
-        merge_files(outdir, outdir.parent / f"merged_{n}.h5")
+        merge_files(outdir, outdir.parent / f"merged{n}.h5")
         print("Done merging!")
 
 
