@@ -26,13 +26,6 @@ from common.variables import A_PDG_ID, DR_MATCH
 _LEPTON_IDS = frozenset({11, 12, 13, 14, 15, 16})
 
 
-def _dr(eta1: float, phi1: float, eta2: np.ndarray, phi2: np.ndarray) -> np.ndarray:
-    deta = eta1 - eta2
-    dphi = phi1 - phi2
-    dphi = np.where(dphi > np.pi, dphi - 2 * np.pi,
-           np.where(dphi < -np.pi, dphi + 2 * np.pi, dphi))
-    return np.sqrt(deta**2 + dphi**2)
-
 
 def find_a_bosons(gen_pdgid, gen_status_flags):
     """Boolean mask of GenParts that are the a (PDG 36) and last copy.
@@ -100,17 +93,6 @@ def label_jets(
             truth_amass_out.append(tamass)
             continue
 
-        # Hadronic daughters of any a boson (direct, non-leptonic children)
-        dau_mask = np.zeros(len(pdg), dtype=bool)
-        for a_idx in a_indices:
-            is_child    = mothers == a_idx
-            is_hadronic = ~np.isin(np.abs(pdg), list(_LEPTON_IDS))
-            dau_mask   |= is_child & is_hadronic
-
-        dau_etas = g_eta[dau_mask]
-        dau_phis = g_phi[dau_mask]
-        n_dau    = len(dau_etas)
-
         j_etas = np.asarray(jet_eta[ievt])
         j_phis = np.asarray(jet_phi[ievt])
 
@@ -122,24 +104,48 @@ def label_jets(
                    np.where(dphi < -np.pi, dphi + 2 * np.pi, dphi))
             return np.sqrt(deta ** 2 + dphi ** 2)
 
-        # Condition 1: any a boson within DR_MATCH of the jet
-        dr_a    = _dr_matrix(g_eta[a_mask], g_phi[a_mask])  # (n_jets, n_a)
-        close_a = np.any(dr_a < dr_match, axis=1)           # (n_jets,)
+        dr_to_a = _dr_matrix(g_eta[a_mask], g_phi[a_mask])  # (n_jets, n_a)
 
-        # Condition 2: all hadronic daughters within DR_MATCH
-        if n_dau == 0:
+        # Per-boson matching: both conditions must hold for the SAME boson.
+        matched_by        = []  # one (n_jets,) bool array per boson
+        has_had_daughters = []
+
+        for i_a, a_idx in enumerate(a_indices):
+            is_child    = mothers == a_idx
+            is_hadronic = ~np.isin(np.abs(pdg), list(_LEPTON_IDS))
+            dau_mask_i  = is_child & is_hadronic
+
+            dau_etas_i = g_eta[dau_mask_i]
+            dau_phis_i = g_phi[dau_mask_i]
+
+            if len(dau_etas_i) == 0:
+                has_had_daughters.append(False)
+                matched_by.append(np.zeros(len(j_etas), dtype=bool))
+                continue
+
+            has_had_daughters.append(True)
+            close_this_a = dr_to_a[:, i_a] < dr_match           # (n_jets,)
+            dr_dau_i     = _dr_matrix(dau_etas_i, dau_phis_i)   # (n_jets, n_dau_i)
+            all_dau_in_i = np.all(dr_dau_i < dr_match, axis=1)  # (n_jets,)
+            matched_by.append(close_this_a & all_dau_in_i)
+
+        if not any(has_had_daughters):
             labels_out.append(jet_labels)
             truth_amass_out.append(tamass)
             continue
-        dr_dau     = _dr_matrix(dau_etas, dau_phis)          # (n_jets, n_dau)
-        all_dau_in = np.all(dr_dau < dr_match, axis=1)       # (n_jets,)
 
-        jet_labels = (close_a & all_dau_in).astype(np.int32)
+        matched_matrix = np.column_stack(matched_by)             # (n_jets, n_a)
+        jet_labels     = np.any(matched_matrix, axis=1).astype(np.int32)
 
-        # truth_a_mass: pole mass of the closest matched a boson
+        # truth_a_mass: pole mass of the closest boson that triggered label=1
         if g_mass is not None and np.any(jet_labels):
-            a_jet_idxs    = np.where(jet_labels)[0]
-            closest_a_col = np.argmin(dr_a[a_jet_idxs], axis=1)  # col index into a_indices
+            a_jet_idxs = np.where(jet_labels)[0]
+            dr_masked  = np.where(
+                matched_matrix[a_jet_idxs],
+                dr_to_a[a_jet_idxs],
+                np.inf,
+            )
+            closest_a_col      = np.argmin(dr_masked, axis=1)
             tamass[a_jet_idxs] = g_mass[a_indices[closest_a_col]]
 
         labels_out.append(jet_labels)
